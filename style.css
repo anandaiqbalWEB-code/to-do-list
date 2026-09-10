@@ -1,0 +1,14 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+}
+
+.tugas-tugas {
+    display: flex;
+}
+
+.tugas-selesai:checked+.nama-tugas {
+    text-decoration: line-through;
+    color: gray;
+}

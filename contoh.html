@@ -1,0 +1,642 @@
+
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>To-Do List</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+        }
+
+        .container {
+            width: 500px;
+            max-width: 90%;
+            margin: 50px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        /* INPUT */
+
+        .form {
+            display: flex;
+            gap: 10px;
+        }
+
+        #inputTugas {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        #tombolTambah {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            background: black;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* SEARCH */
+
+        #inputCari {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        /* FILTER */
+
+        .filter {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .filter button {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .filter button.aktif {
+            background: black;
+            color: white;
+        }
+
+        /* LIST */
+
+        #daftarTugas {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tugas {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .namaTugas {
+            flex: 1;
+        }
+
+        .tugas.selesai .namaTugas {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .tombol {
+            border: none;
+            padding: 7px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .edit {
+            background: orange;
+        }
+
+        .hapus {
+            background: red;
+            color: white;
+        }
+
+        /* BAWAH */
+
+        .bawah {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        #hapusSelesai {
+            border: none;
+            background: #ddd;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 500px) {
+
+            .form {
+                flex-direction: column;
+            }
+
+            #tombolTambah {
+                width: 100%;
+            }
+
+            .tugas {
+                flex-wrap: wrap;
+            }
+
+            .namaTugas {
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>To-Do List</h1>
+
+        <!-- INPUT TUGAS -->
+
+        <div class="form">
+
+            <input type="text" id="inputTugas" placeholder="Masukkan tugas...">
+
+            <button id="tombolTambah">
+                Tambah
+            </button>
+
+        </div>
+
+        <!-- SEARCH -->
+
+        <input type="text" id="inputCari" placeholder="Cari tugas...">
+
+        <!-- FILTER -->
+
+        <div class="filter">
+
+            <button class="aktif" data-filter="semua">
+                Semua
+            </button>
+
+            <button data-filter="aktif">
+                Aktif
+            </button>
+
+            <button data-filter="selesai">
+                Selesai
+            </button>
+
+        </div>
+
+        <!-- DAFTAR TUGAS -->
+
+        <ul id="daftarTugas"></ul>
+
+        <!-- BAGIAN BAWAH -->
+
+        <div class="bawah">
+
+            <span>
+                Total tugas:
+                <strong id="jumlahTugas">0</strong>
+            </span>
+
+            <button id="hapusSelesai">
+                Hapus selesai
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // =========================
+        // 1. AMBIL ELEMENT HTML
+        // =========================
+
+        const inputTugas =
+            document.getElementById("inputTugas");
+
+        const tombolTambah =
+            document.getElementById("tombolTambah");
+
+        const inputCari =
+            document.getElementById("inputCari");
+
+        const daftarTugas =
+            document.getElementById("daftarTugas");
+
+        const jumlahTugas =
+            document.getElementById("jumlahTugas");
+
+        const hapusSelesai =
+            document.getElementById("hapusSelesai");
+
+
+        // =========================
+        // 2. DATA TUGAS
+        // =========================
+
+        let dataTugas =
+            JSON.parse(localStorage.getItem("tugas")) || [];
+
+        let filterSekarang = "semua";
+
+
+        // =========================
+        // 3. TAMPILKAN TUGAS
+        // =========================
+
+        function tampilkanTugas() {
+
+            daftarTugas.innerHTML = "";
+
+            const kataCari =
+                inputCari.value.toLowerCase();
+
+
+            dataTugas.forEach(function (tugas, index) {
+
+                // FILTER STATUS
+
+                if (
+                    filterSekarang === "aktif"
+                    && tugas.selesai === true
+                ) {
+                    return;
+                }
+
+                if (
+                    filterSekarang === "selesai"
+                    && tugas.selesai === false
+                ) {
+                    return;
+                }
+
+
+                // FILTER PENCARIAN
+
+                if (
+                    !tugas.nama
+                        .toLowerCase()
+                        .includes(kataCari)
+                ) {
+                    return;
+                }
+
+
+                // BUAT LI
+
+                const li =
+                    document.createElement("li");
+
+                li.classList.add("tugas");
+
+
+                if (tugas.selesai) {
+                    li.classList.add("selesai");
+                }
+
+
+                // CHECKBOX
+
+                const checkbox =
+                    document.createElement("input");
+
+                checkbox.type = "checkbox";
+
+                checkbox.checked =
+                    tugas.selesai;
+
+
+                checkbox.addEventListener(
+                    "change",
+                    function () {
+
+                        tugas.selesai =
+                            checkbox.checked;
+
+                        simpanData();
+
+                        tampilkanTugas();
+
+                    }
+                );
+
+
+                // NAMA TUGAS
+
+                const nama =
+                    document.createElement("span");
+
+                nama.classList.add("namaTugas");
+
+                nama.textContent =
+                    tugas.nama;
+
+
+                // TOMBOL EDIT
+
+                const tombolEdit =
+                    document.createElement("button");
+
+                tombolEdit.textContent =
+                    "Edit";
+
+                tombolEdit.classList.add(
+                    "tombol",
+                    "edit"
+                );
+
+
+                tombolEdit.addEventListener(
+                    "click",
+                    function () {
+
+                        const namaBaru =
+                            prompt(
+                                "Ubah tugas:",
+                                tugas.nama
+                            );
+
+
+                        if (
+                            namaBaru !== null
+                            && namaBaru.trim() !== ""
+                        ) {
+
+                            tugas.nama =
+                                namaBaru.trim();
+
+                            simpanData();
+
+                            tampilkanTugas();
+
+                        }
+
+                    }
+                );
+
+
+                // TOMBOL HAPUS
+
+                const tombolHapus =
+                    document.createElement("button");
+
+                tombolHapus.textContent =
+                    "Hapus";
+
+                tombolHapus.classList.add(
+                    "tombol",
+                    "hapus"
+                );
+
+
+                tombolHapus.addEventListener(
+                    "click",
+                    function () {
+
+                        dataTugas.splice(index, 1);
+
+                        simpanData();
+
+                        tampilkanTugas();
+
+                    }
+                );
+
+
+                // MASUKKAN KE LI
+
+                li.appendChild(checkbox);
+
+                li.appendChild(nama);
+
+                li.appendChild(tombolEdit);
+
+                li.appendChild(tombolHapus);
+
+
+                // MASUKKAN LI KE UL
+
+                daftarTugas.appendChild(li);
+
+            });
+
+
+            // JUMLAH TUGAS
+
+            jumlahTugas.textContent =
+                dataTugas.length;
+
+        }
+
+
+        // =========================
+        // 4. TAMBAH TUGAS
+        // =========================
+
+        function tambahTugas() {
+
+            const nama =
+                inputTugas.value.trim();
+
+
+            if (nama === "") {
+
+                alert("Tugas tidak boleh kosong!");
+
+                return;
+
+            }
+
+
+            const tugasBaru = {
+
+                nama: nama,
+
+                selesai: false
+
+            };
+
+
+            dataTugas.push(tugasBaru);
+
+
+            inputTugas.value = "";
+
+
+            simpanData();
+
+            tampilkanTugas();
+
+            inputTugas.focus();
+
+        }
+
+
+        // =========================
+        // 5. KLIK TAMBAH
+        // =========================
+
+        tombolTambah.addEventListener(
+            "click",
+            tambahTugas
+        );
+
+
+        // =========================
+        // 6. ENTER
+        // =========================
+
+        inputTugas.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+
+                    tambahTugas();
+
+                }
+
+            }
+        );
+
+
+        // =========================
+        // 7. SEARCH
+        // =========================
+
+        inputCari.addEventListener(
+            "input",
+            function () {
+
+                tampilkanTugas();
+
+            }
+        );
+
+
+        // =========================
+        // 8. FILTER
+        // =========================
+
+        const tombolFilter =
+            document.querySelectorAll(
+                ".filter button"
+            );
+
+
+        tombolFilter.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        filterSekarang =
+                            button.dataset.filter;
+
+
+                        tombolFilter.forEach(
+                            function (button) {
+
+                                button.classList.remove(
+                                    "aktif"
+                                );
+
+                            }
+                        );
+
+
+                        button.classList.add(
+                            "aktif"
+                        );
+
+
+                        tampilkanTugas();
+
+                    }
+                );
+
+            }
+        );
+
+
+        // =========================
+        // 9. HAPUS TUGAS SELESAI
+        // =========================
+
+        hapusSelesai.addEventListener(
+            "click",
+            function () {
+
+                dataTugas =
+                    dataTugas.filter(
+                        function (tugas) {
+
+                            return tugas.selesai === false;
+
+                        }
+                    );
+
+
+                simpanData();
+
+                tampilkanTugas();
+
+            }
+        );
+
+
+        // =========================
+        // 10. LOCAL STORAGE
+        // =========================
+
+        function simpanData() {
+
+            localStorage.setItem(
+                "tugas",
+                JSON.stringify(dataTugas)
+            );
+
+        }
+
+
+        // =========================
+        // 11. TAMPILKAN SAAT AWAL
+        // =========================
+
+        tampilkanTugas();
+
+    </script>
+
+</body>
+
+</html>

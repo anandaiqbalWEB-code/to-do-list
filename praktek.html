@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <h2>Daftar Tugas</h2>
+
+    <!-- TOMBOL -->
+    <button id="semua">Semua</button>
+    <button id="aktif">Aktif</button>
+    <button id="selesai">Selesai</button>
+
+    <div id="hasil"></div>
+
+
+    <script>
+
+        let tugas = [
+            {
+                nama: "Belajar HTML",
+                selesai: false
+            },
+            {
+                nama: "Belajar CSS",
+                selesai: false
+            },
+            {
+                nama: "Belajar JavaScript",
+                selesai: true
+            }
+        ];
+
+
+        const hasil = document.getElementById("hasil");
+
+
+        // MENAMPILKAN TUGAS
+        function tampilkan(data) {
+
+            hasil.innerHTML = "";
+
+            data.forEach(function (item, index) {
+
+                hasil.innerHTML += `
+                    <p>
+
+                        <input 
+                            type="checkbox"
+                            class="checkbox"
+                            data-index="${index}"
+                            ${item.selesai ? "checked" : ""}
+                        >
+
+                        ${item.nama}
+
+                    </p>
+                `;
+
+            });
+
+
+            // MENGAMBIL CHECKBOX
+            const checkbox = document.querySelectorAll(".checkbox");
+
+
+            checkbox.forEach(function (cek) {
+
+                cek.addEventListener("change", function () {
+
+                    const nomorr = cek.dataset.index;
+
+                    tugas[nomorr].selesai = cek.checked;
+
+                    console.log(tugas[nomorr])
+
+                    tampilkan(tugas);
+
+                });
+
+            });
+
+        }
+
+
+        // TOMBOL SEMUA
+        document.getElementById("semua").addEventListener("click", function () {
+
+            tampilkan(tugas);
+
+        });
+
+
+        // TOMBOL AKTIF
+        document.getElementById("aktif").addEventListener("click", function () {
+
+            const hasilAktif = tugas.filter(function (item) {
+
+                return item.selesai === false;
+
+            });
+
+            tampilkan(hasilAktif);
+
+        });
+
+
+        // TOMBOL SELESAI
+        document.getElementById("selesai").addEventListener("click", function () {
+
+            const hasilSelesai = tugas.filter(function (item) {
+
+                return item.selesai === true;
+
+            });
+
+            tampilkan(hasilSelesai);
+
+        });
+
+
+        // SAAT HALAMAN DIBUKA
+        tampilkan(tugas);
+
+    </script>
+
+</body>
+
+</html>

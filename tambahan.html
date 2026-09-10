@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div>
+
+        <form class="form">
+
+            <input type="text" id="tugas">
+
+            <button id="tambahTugas">Tambah</button>
+
+        </form>
+
+        <input type="text" id="filter">
+
+        <div>
+
+            <button id="semua">Semua</button>
+
+            <button id="aktif">Aktif</button>
+
+            <button id="selesai">Selesai</button>
+
+        </div>
+
+        <div id="tugasList"></div>
+
+        <div>
+
+            <div>
+                Total Tugas :
+                <span id="jumlahTugas">0</span>
+            </div>
+
+            <button>Hapus Selesai</button>
+
+        </div>
+
+
+        <script>
+
+            const tugas = document.getElementById('tugas');
+            const tambahTugas = document.getElementById('tambahTugas');
+            const filter = document.getElementById('filter');
+            const tugasList = document.getElementById('tugasList');
+            const jumlahTugas = document.getElementById('jumlahTugas');
+
+            let arrayTugas = [];
+
+
+            // MENAMPILKAN TUGAS
+
+            function berbagaiTugas(data) {
+
+                tugasList.innerHTML = "";
+
+                data.forEach(function (item, index) {
+
+                    tugasList.innerHTML += `
+                    
+                        <div class="tugas-tugas">
+
+                            <input 
+                                type="checkbox"
+                                class="tugas-selesai"
+                                data-index="${index}"
+                                ${item.selesai ? "checked" : ""}
+                            >
+
+                            <p class="nama-tugas">
+                                ${item.nama}
+                            </p>
+
+                            <button class="editTugas">
+                                Edit
+                            </button>
+
+                            <button class="hapusTugas">
+                                Hapus
+                            </button>
+
+                        </div>
+                    
+                    `;
+
+                });
+
+
+                // AMBIL CHECKBOX SETELAH CHECKBOX DIBUAT
+
+                const checkbox = document.querySelectorAll(".tugas-selesai");
+
+
+                checkbox.forEach(function (cek) {
+
+                    cek.addEventListener("change", function () {
+
+                        const index = cek.dataset.index;
+
+                        arrayTugas[index].selesai = cek.checked;
+
+                        berbagaiTugas(arrayTugas);
+
+                    });
+
+                });
+
+            }
+
+
+            // MEMBUAT TUGAS
+
+            function membuatTugas(event) {
+
+                event.preventDefault();
+
+                if (tugas.value === "") {
+
+                    alert("Tidak Boleh Kosong");
+
+                    return;
+
+                }
+
+                arrayTugas.push({
+
+                    nama: tugas.value,
+
+                    selesai: false
+
+                });
+
+                tugas.value = "";
+
+                berbagaiTugas(arrayTugas);
+
+            }
+
+
+            // TOMBOL TAMBAH
+
+            tambahTugas.addEventListener("click", membuatTugas);
+
+
+            // SEMUA
+
+            const semua = document.getElementById("semua");
+
+            semua.addEventListener("click", function () {
+
+                berbagaiTugas(arrayTugas);
+
+            });
+
+
+            // AKTIF
+
+            const aktif = document.getElementById("aktif");
+
+            aktif.addEventListener("click", function () {
+
+                const tugasAktif = arrayTugas.filter(function (item) {
+
+                    return item.selesai === false;
+
+                });
+
+                berbagaiTugas(tugasAktif);
+
+            });
+
+
+            // SELESAI
+
+            const selesai = document.getElementById("selesai");
+
+            selesai.addEventListener("click", function () {
+
+                const tugasSelesai = arrayTugas.filter(function (item) {
+
+                    return item.selesai === true;
+
+                });
+
+                berbagaiTugas(tugasSelesai);
+
+            });
+
+
+        </script>
+
+    </div>
+
+</body>
+
+</html>
