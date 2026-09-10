@@ -1,14 +1,106 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background-color: whitesmoke;
+}
+
+.container {
+    background-color: white;
+    width: 450px;
+    margin: 0 auto;
+    padding: 10px 22px;
+    box-shadow: 0px 5px 22px grey;
+    border-radius: 8px;
+}
+
+h1 {
+    text-align: center;
+}
+
 .form {
     display: flex;
     flex-direction: column;
-    width: 400px;
+    gap: 8px;
+}
+
+.form #tugas,
+.form #tambahTugas,
+#filter {
+    height: 33px;
+    padding: 7px;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid grey;
+}
+
+#tambahTugas {
+    background-color: black;
+    color: white;
+}
+
+#filter {
+    margin: 8px 0;
+}
+
+.kondisi-tugas {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.kondisi-tugas button {
+    padding: 9px 12px;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid grey;
+    transition: 0.2s;
+}
+
+.kondisi-tugas button:hover {
+    background-color: #cfcdcd8a;
+}
+
+.kondisi-tugas .menyala.active {
+    background-color: black;
+    color: white;
 }
 
 .tugas-tugas {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0px;
+}
+
+.tugas-left {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-tugas,
+#hapusTugas {
+    padding: 5px 10px;
+}
+
+hr {
+    margin-top: 6px;
+    margin-bottom: 3px;
 }
 
 .tugas-selesai:checked+.nama-tugas {
     text-decoration: line-through;
     color: gray;
+}
+
+.total-bottom {
+    display: flex;
+    justify-content: space-between;
 }
